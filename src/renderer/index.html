@@ -39,7 +39,7 @@
             </button>
             <button id="add-note" class="accent-button" type="button">
               <span aria-hidden="true">+</span>
-              Obje
+              Post-it
             </button>
           </div>
         </header>
@@ -54,17 +54,8 @@
       <form method="dialog" class="dialog-form">
         <h2 id="dialog-title">Kart</h2>
         <input id="note-title" maxlength="48" placeholder="Kisa baslik" />
+        <input id="note-type" type="hidden" value="postit" />
         <div class="field-row">
-          <label>
-            Tur
-            <select id="note-type">
-              <option value="postit">Post-it</option>
-              <option value="todo">To-do</option>
-              <option value="text">Yazi</option>
-              <option value="image">Resim</option>
-              <option value="board">Pano</option>
-            </select>
-          </label>
           <label>
             Boyut
             <select id="note-size">
@@ -73,9 +64,13 @@
               <option value="large">Buyuk</option>
             </select>
           </label>
+          <div class="component-menu" id="component-menu" aria-label="Component ekle">
+            <button id="add-text-component" class="ghost-button" type="button" title="Yazi ekle">T</button>
+            <button id="add-todo-component" class="ghost-button" type="button" title="To-do ekle">☑</button>
+            <button id="add-image-component" class="ghost-button" type="button" title="Foto ekle">▧</button>
+          </div>
         </div>
-        <textarea id="note-tasks" maxlength="420" placeholder="Her satir bir is"></textarea>
-        <input id="note-image" maxlength="800" placeholder="Resim URL veya dosya yolu" />
+        <div class="component-editor" id="component-editor"></div>
         <div class="field-row">
           <label>
             Durum
@@ -101,6 +96,24 @@
           <button value="cancel" type="submit">Vazgec</button>
           <button id="save-note" class="accent-button" value="default" type="submit">Kaydet</button>
         </menu>
+      </form>
+    </dialog>
+
+    <dialog id="section-dialog">
+      <form method="dialog" class="dialog-form compact-dialog">
+        <h2>Yeni baslik</h2>
+        <input id="section-title" maxlength="32" placeholder="Baslik adi" />
+        <menu class="dialog-actions">
+          <button value="cancel" type="submit">Vazgec</button>
+          <button id="save-section" class="accent-button" value="default" type="submit">Ekle</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <dialog id="image-preview-dialog" class="image-preview-dialog">
+      <form method="dialog" class="image-preview-frame">
+        <button class="image-preview-close" value="cancel" type="submit">×</button>
+        <img id="image-preview" alt="Foto onizleme" />
       </form>
     </dialog>
 

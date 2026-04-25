@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, dialog, ipcMain } = require("electron");
 const fs = require("node:fs/promises");
 const path = require("node:path");
 
@@ -60,10 +60,41 @@ const createDefaultData = () => ({
     }
   ],
   selectedSectionId: "today",
-  focusNoteId: "n-1"
+  focusNoteId: "n-1",
+  rootZoom: 1
 });
 
 const dataPath = () => path.join(app.getPath("userData"), "planner-data.json");
+const assetsDir = () => path.join(app.getPath("userData"), "assets");
+const assetUrl = (name) => `file://${path.join(assetsDir(), name)}`;
+
+function assetName(originalName = "image.png") {
+  const ext = path.extname(originalName) || ".png";
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}${ext.toLowerCase()}`;
+}
+
+async function importImageFile() {
+  const result = await dialog.showOpenDialog({
+    title: "Resim sec",
+    properties: ["openFile"],
+    filters: [{ name: "Images", extensions: ["png", "jpg", "jpeg", "gif", "webp", "bmp"] }]
+  });
+  if (result.canceled || !result.filePaths[0]) return null;
+
+  await fs.mkdir(assetsDir(), { recursive: true });
+  const source = result.filePaths[0];
+  const name = assetName(path.basename(source));
+  await fs.copyFile(source, path.join(assetsDir(), name));
+  return assetUrl(name);
+}
+
+async function saveImageAsset(_event, payload) {
+  await fs.mkdir(assetsDir(), { recursive: true });
+  const name = assetName(payload?.name || "pasted-image.png");
+  const bytes = Buffer.from(payload.bytes);
+  await fs.writeFile(path.join(assetsDir(), name), bytes);
+  return assetUrl(name);
+}
 
 async function readData() {
   try {
@@ -99,9 +130,28 @@ function createWindow() {
   win.loadFile(path.join(__dirname, "renderer", "index.html"));
 }
 
+function openItemWindow(_event, itemId) {
+  const win = new BrowserWindow({
+    width: 860,
+    height: 640,
+    minWidth: 520,
+    minHeight: 420,
+    title: "PlanlaMa Obje",
+    backgroundColor: "#1e1e1e",
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js")
+    }
+  });
+
+  win.loadFile(path.join(__dirname, "renderer", "item.html"), { query: { id: itemId } });
+}
+
 app.whenReady().then(() => {
   ipcMain.handle("planner:load", readData);
   ipcMain.handle("planner:save", (_event, data) => writeData(data));
+  ipcMain.handle("planner:importImage", importImageFile);
+  ipcMain.handle("planner:saveImageAsset", saveImageAsset);
+  ipcMain.handle("planner:openItemWindow", openItemWindow);
 
   createWindow();
 
