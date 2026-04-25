@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PlanlaMa</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Plan basliklari">
+        <div class="brand">
+          <div class="brand-mark">P</div>
+          <div>
+            <h1>PlanlaMa</h1>
+            <p>Gorsel plan panosu</p>
+          </div>
+        </div>
+
+        <button class="primary-action" id="add-section" type="button">
+          <span aria-hidden="true">+</span>
+          Baslik
+        </button>
+
+        <nav class="section-list" id="section-list"></nav>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Aktif alan</p>
+            <h2 id="active-title">Bugun</h2>
+          </div>
+          <div class="toolbar" role="toolbar" aria-label="Pano araclari">
+            <button id="focus-mode" class="icon-button" type="button" title="Odak modu">◎</button>
+            <button id="add-board" class="ghost-button" type="button">
+              <span aria-hidden="true">+</span>
+              Pano
+            </button>
+            <button id="add-note" class="accent-button" type="button">
+              <span aria-hidden="true">+</span>
+              Obje
+            </button>
+          </div>
+        </header>
+
+        <section class="focus-strip" id="focus-strip"></section>
+
+        <section class="corkboard" id="corkboard" aria-label="Mantar pano"></section>
+      </main>
+    </div>
+
+    <dialog id="note-dialog">
+      <form method="dialog" class="dialog-form">
+        <h2 id="dialog-title">Kart</h2>
+        <input id="note-title" maxlength="48" placeholder="Kisa baslik" />
+        <div class="field-row">
+          <label>
+            Tur
+            <select id="note-type">
+              <option value="postit">Post-it</option>
+              <option value="todo">To-do</option>
+              <option value="text">Yazi</option>
+              <option value="image">Resim</option>
+              <option value="board">Pano</option>
+            </select>
+          </label>
+          <label>
+            Boyut
+            <select id="note-size">
+              <option value="small">Kucuk</option>
+              <option value="medium">Orta</option>
+              <option value="large">Buyuk</option>
+            </select>
+          </label>
+        </div>
+        <textarea id="note-tasks" maxlength="420" placeholder="Her satir bir is"></textarea>
+        <input id="note-image" maxlength="800" placeholder="Resim URL veya dosya yolu" />
+        <div class="field-row">
+          <label>
+            Durum
+            <select id="note-status">
+              <option value="next">Sirada</option>
+              <option value="doing">Simdi</option>
+              <option value="waiting">Bekliyor</option>
+              <option value="done">Bitti</option>
+            </select>
+          </label>
+          <label>
+            Enerji
+            <select id="note-energy">
+              <option value="low">Dusuk</option>
+              <option value="medium">Orta</option>
+              <option value="high">Yuksek</option>
+            </select>
+          </label>
+        </div>
+        <div class="swatches" id="color-swatches" aria-label="Kart rengi"></div>
+        <menu class="dialog-actions">
+          <button id="delete-note" class="ghost-danger" type="button">Sil</button>
+          <button value="cancel" type="submit">Vazgec</button>
+          <button id="save-note" class="accent-button" value="default" type="submit">Kaydet</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

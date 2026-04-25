@@ -1,0 +1,12 @@
+{
+  "name": "planlama",
+  "version": "0.1.0",
+  "description": "ADHD-friendly local planning board built with Electron.",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "env -u ELECTRON_RUN_AS_NODE electron ."
+  },
+  "devDependencies": {
+    "electron": "^31.7.7"
+  }
+}
