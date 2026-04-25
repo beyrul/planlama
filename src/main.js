@@ -152,6 +152,9 @@ app.whenReady().then(() => {
   ipcMain.handle("planner:importImage", importImageFile);
   ipcMain.handle("planner:saveImageAsset", saveImageAsset);
   ipcMain.handle("planner:openItemWindow", openItemWindow);
+  ipcMain.handle("planner:closeWindow", (event) => {
+    BrowserWindow.fromWebContents(event.sender)?.close();
+  });
 
   createWindow();
 

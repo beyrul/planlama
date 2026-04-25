@@ -681,15 +681,19 @@ function startDrag(card, itemId, event) {
   const layer = card.parentElement;
   const layerRect = layer.getBoundingClientRect();
   const cardRect = card.getBoundingClientRect();
+  const scale = layerScale(layer);
   dragState = {
     itemId,
     card,
     layer,
-    scale: layerScale(layer),
+    scale,
     startX: event.clientX,
     startY: event.clientY,
-    initialX: (cardRect.left - layerRect.left) / layerScale(layer),
-    initialY: (cardRect.top - layerRect.top) / layerScale(layer),
+    initialX: (cardRect.left - layerRect.left) / scale,
+    initialY: (cardRect.top - layerRect.top) / scale,
+    grabX: (event.clientX - cardRect.left) / scale,
+    grabY: (event.clientY - cardRect.top) / scale,
+    dropLayer: layer,
     moved: false
   };
   card.classList.add("dragging");
@@ -710,6 +714,7 @@ function dragMove(event) {
   const y = Math.min(maxY, Math.max(8, dragState.initialY + dy));
   dragState.card.style.left = `${x}px`;
   dragState.card.style.top = `${y}px`;
+  updateDropTarget(event);
 }
 
 function layerScale(layer) {
@@ -728,13 +733,64 @@ async function dragEnd(event) {
   card.removeEventListener("pointercancel", dragEnd);
   card.classList.remove("dragging");
   card.dataset.dragged = moved ? "true" : "false";
-  dragState = null;
+  clearDropTarget();
 
-  if (!moved) return;
-  const x = Number.parseInt(card.style.left, 10);
-  const y = Number.parseInt(card.style.top, 10);
-  data.notes = data.notes.map((item) => (item.id === itemId ? { ...item, x, y } : item));
+  if (!moved) {
+    dragState = null;
+    return;
+  }
+
+  const drop = getDropDestination(event, itemId);
+  const rect = drop.layer.getBoundingClientRect();
+  const scale = layerScale(drop.layer);
+  const x = Math.max(8, (event.clientX - rect.left) / scale - dragState.grabX);
+  const y = Math.max(8, (event.clientY - rect.top) / scale - dragState.grabY);
+  data.notes = data.notes.map((item) => (item.id === itemId ? { ...item, parentId: drop.parentId, x, y } : item));
+  dragState = null;
   await persist();
+  render();
+}
+
+function updateDropTarget(event) {
+  if (!dragState) return;
+  const drop = getDropDestination(event, dragState.itemId);
+  if (drop.layer === dragState.dropLayer) return;
+  clearDropTarget();
+  dragState.dropLayer = drop.layer;
+  drop.layer.closest(".object-card")?.classList.add("drop-target");
+  if (drop.parentId === null) $("#root-layer")?.classList.add("drop-target");
+}
+
+function clearDropTarget() {
+  document.querySelectorAll(".drop-target").forEach((node) => node.classList.remove("drop-target"));
+}
+
+function getDropDestination(event, itemId) {
+  const board = document
+    .elementsFromPoint(event.clientX, event.clientY)
+    .map((node) => node.closest?.(".object-card.type-board"))
+    .find((node) => node && node.dataset.itemId !== itemId && canMoveInto(itemId, node.dataset.itemId));
+
+  if (board) {
+    return {
+      parentId: board.dataset.itemId,
+      layer: board.querySelector(".object-layer")
+    };
+  }
+
+  return {
+    parentId: null,
+    layer: $("#root-layer")
+  };
+}
+
+function canMoveInto(itemId, targetParentId) {
+  let current = targetParentId;
+  while (current) {
+    if (current === itemId) return false;
+    current = data.notes.find((item) => item.id === current)?.parentId || null;
+  }
+  return true;
 }
 
 function startResize(card, itemId, event) {

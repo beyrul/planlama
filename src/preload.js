@@ -5,5 +5,6 @@ contextBridge.exposeInMainWorld("planner", {
   save: (data) => ipcRenderer.invoke("planner:save", data),
   importImage: () => ipcRenderer.invoke("planner:importImage"),
   saveImageAsset: (payload) => ipcRenderer.invoke("planner:saveImageAsset", payload),
-  openItemWindow: (itemId) => ipcRenderer.invoke("planner:openItemWindow", itemId)
+  openItemWindow: (itemId) => ipcRenderer.invoke("planner:openItemWindow", itemId),
+  closeWindow: () => ipcRenderer.invoke("planner:closeWindow")
 });
