@@ -87,4 +87,4 @@ PlanlaMa stores planner data locally in Electron's `userData` directory as `plan
 
 ## License
 
-No license has been added yet.
+MIT License. See [LICENSE](LICENSE) for details.
